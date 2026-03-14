@@ -121,7 +121,17 @@ template <typename Key, typename Value>
 bool LinearProbing<Key, Value>::remove(const Key& key) {
     // TODO: implement remove
     size_t index = hash(key);
+    while (table_.get(index).status != SlotStatus::EMPTY) {
+        if (table_.get(index).key == key && table_.get(index).status == SlotStatus::OCCUPIED) {
+            table_.get(index).status = SlotStatus::DELETED;
+            count_--;
+            return true;
+        }
 
+        index = (index + 1) % capacity_;
+    }
+
+    return false;
 }
 
 template <typename Key, typename Value>
