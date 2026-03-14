@@ -82,21 +82,34 @@ void LinearProbing<Key, Value>::insert(const Key& key, const Value& value) {
 
         std::optional, if you want the actual key value or value value, call .key.value() or .value.value()
         here should just be .key since key parameter is of type Key.
+
+
+
+        forgot about tombstones
+        see a deleted slot -> mark the index there and keep probing
     */
 
     double one = 1.0;
     if (((count_ + 1) * one / capacity_) > LOAD_FACTOR) { rehash(); }
 
     size_t index = hash(key);
-    while (table_.get(index).status == SlotStatus::OCCUPIED) {
-        if (table_.get(index).key == key) {
-            table.get(index).value = value; 
+    int deleted_index = -1; // cant do 0 i think?
+    while (table_.get(index).status != SlotStatus::EMPTY) {
+        if (table_.get(index).status == SlotStatus::OCCUPIED && table_.get(index).key == key) {
+            table_.get(index).value = value; 
             return;
+        }
+
+        if (table_.get(index).status == SlotStatus::DELETED) {
+            deleted_index = index;
         }
         index = (index + 1) % capacity_;
     }
 
-    auto slot = table.get(index);
+
+    int correct_index = (deleted_index == -1) ? index : deleted_index;
+    
+    auto& slot = table_.get(correct_index);
     slot.key = key;
     slot.value = value;
     slot.status = SlotStatus::OCCUPIED;
@@ -121,6 +134,7 @@ Value* LinearProbing<Key, Value>::find(const Key& key) {
             return nullptr;
         }
 
+        // occupied since it could still be tombstone (aka deleted)
         if (table_.get(index).status == SlotStatus::OCCUPIED && table_.get(index).key == key) {
             return &table_.get(index).value;
         }
