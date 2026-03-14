@@ -180,13 +180,28 @@ void LinearProbing<Key, Value>::rehash() {
     
     // note to self when implementing this, use the built in hash. std::optional for key and value
     // has a function that you can call named .value(). You cant just call slot.key, call slot.key.value()
+    // sincee table.get(i).key returns std::optional<key> instead of Key
 
-    size_t newCap = capacity_ * 2;
-    ArrayList<Slot> newArrayList(newCap);
+    size_t oldCapacity = capacity_;
+    capacity_ *= 2;
+    ArrayList<Slot> newArrayList(capacity_);
 
-    for (size_t i = 0; i < table_.size(); i++) {
+    for (size_t i = 0; i < oldCapacity; i++) {
         if (table_.get(i).status == SlotStatus::OCCUPIED) {
+            Key& key = table_.get(i).key.value();
+            Value& value = table_.get(i).value.value();
+            size_t index = hash(key);
+            
+            while (newArrayList.get(index).status == SlotStatus::OCCUPIED) {
+                index = (index + 1) % capacity_;
+            }
 
+            auto& slot = newArrayList.get(index);
+            slot.key = key;
+            slot.value = value;
+            slot.status = SlotStatus::OCCUPIED;
         }
     }
+
+    table_ = newArrayList;
 }
