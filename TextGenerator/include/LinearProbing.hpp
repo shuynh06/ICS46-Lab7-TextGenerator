@@ -149,7 +149,9 @@ template <typename Key, typename Value>
 Value& LinearProbing<Key, Value>::operator[](const Key& key) {
     // TODO: implement operator[] to return reference to value associated with key
     // if key not found, insert default-constructed Value and return its reference
-
+    if (find(key)) { return *find(key); }
+    insert(key, Value{});
+    return *find(key);
 }
 
 template <typename Key, typename Value>
