@@ -107,11 +107,28 @@ void LinearProbing<Key, Value>::insert(const Key& key, const Value& value) {
 template <typename Key, typename Value>
 bool LinearProbing<Key, Value>::remove(const Key& key) {
     // TODO: implement remove
+    size_t index = hash(key);
+
 }
 
 template <typename Key, typename Value>
 Value* LinearProbing<Key, Value>::find(const Key& key) {
     // TODO: implement find
+    size_t index = hash(key);
+    
+    for (size_t i = 0; i < capacity_; i++) {
+        if (table_.get(index).status == SlotStatus::EMPTY) {
+            return nullptr;
+        }
+
+        if (table_.get(index).status == SlotStatus::OCCUPIED && table_.get(index).key == key) {
+            return &table_.get(index).value;
+        }
+
+        index = (index + 1) % capacity_;
+    }
+
+    return nullptr;
 }
 
 template <typename Key, typename Value>
