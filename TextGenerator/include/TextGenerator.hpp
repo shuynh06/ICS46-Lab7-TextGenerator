@@ -37,7 +37,18 @@ TextGenerator<HashTable>::TextGenerator() : rng_(std::random_device{}()) {}
 template <typename HashTable>
 void TextGenerator<HashTable>::enter(const std::string& first, const std::string& second, const std::string& third) {
     // TODO: implement enter
+    // the keys will be sequences of two words (e.g., “you can”) that you will represent through the StringPair class you created.
+    // sooo, also note to self, accoridng to lab manual .Values will be of type FreqList
+    StringPair p(first, second);
+    FreqList* exists = stringPairList_.find(pair);
 
+    if (!exists) {
+        FreqList list;
+        list.add(third);
+        stringPairList_.insert(p, list);
+    } else {
+        existing->add(third);
+    }
 }
 
 template <typename HashTable>
