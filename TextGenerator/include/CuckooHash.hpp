@@ -164,11 +164,28 @@ void CuckooHash<Key, Value>::insert(const Key& key, const Value& value) {
 template <typename Key, typename Value>
 bool CuckooHash<Key, Value>::remove(const Key& key) {
     // TODO: Implement remove
+    size_t index1 = hash1(key, capacity());
+    size_t index2 = hash2(key, capacity());
+
+    if (table_.get(index1).occupied == true && table_.get(index1).key == key) {
+        table_.get(index1).occupied = false;
+        count_--;;
+        return true;
+    }
+
+    if (table_.get(index2).occupied == true && table_.get(index2).key == key) {
+        table_.get(index2).occupied = false;
+        count--;
+        return true;
+    }
+
+    return false;
 }
 
 template <typename Key, typename Value>
 Value* CuckooHash<Key, Value>::find(const Key& key) {
     // TODO: Implement find
+    
 }
 
 template <typename Key, typename Value>
