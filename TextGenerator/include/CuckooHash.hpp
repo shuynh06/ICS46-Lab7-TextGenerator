@@ -101,6 +101,64 @@ size_t CuckooHash<Key, Value>::hash2(const Key& key, size_t cap) const {
 template <typename Key, typename Value>
 void CuckooHash<Key, Value>::insert(const Key& key, const Value& value) {
     // TODO: Implement insert with cuckoo hashing and rehashing
+    size_t index1 = hash1(key, capacity());
+    size_t index2 = hash2(key, capacity());
+
+
+    if (table_.get(index1).occupied && table_.get(index1).key == key) {
+        table_.get(index1).value = value;
+        return;
+    } else if (table_.get(index1).occupied == false) {
+        table_.get(index1).key = key;
+        table_.get(index1).value = value;
+        table_.get(index1).occupied = true;
+        count_++;
+        return;
+    }
+
+    if (table_.get(index2).occupied && table_.get(index2).key == key) {
+        table_.get(index2).value = value;
+        return;
+    } else if (table_.get(index2).occupied == false) {
+        table_.get(index2).key = key;
+        table_.get(index2).value = value;
+        table_.get(index2).occupied = true;
+        count_++;
+        return;
+    }
+
+    Key currentKey = key;
+    Value currentValue = value;
+    size_t kick = 0;
+    while (kick < maxKick_) {
+        Key oldKey = table_.get(index1).key.value();
+        Value oldValue = table_.get(index1).value.value();
+
+        table_.get(index1).key = currentKey;
+        table_.get(index1).value = currentValue;
+        table_.get(index1).occupied = true;
+
+        size_t newIndex1 = hash1(oldKey, capacity());
+        size_t newIndex2 = hash2(oldKey, capacity());    
+
+        size_t newIndex = (newIndex1 == index1) ? newIndex2: newIndex1;
+
+        if (table_.get(newIndex).occupied == false) {
+            table_.get(newIndex).key = oldKey;
+            table_.get(newIndex).value = oldValue;
+            table_.get(newIndex).occupied = true;
+            count_++;
+            return;
+        }
+
+        currentKey = oldKey;
+        currentValue = oldValue;
+        index1 = newIndex;
+        kick++;
+    }
+
+    rehash();
+    insert(currentKey, currentValue);
 }
 
 template <typename Key, typename Value>
