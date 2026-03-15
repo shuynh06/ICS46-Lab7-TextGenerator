@@ -185,7 +185,18 @@ bool CuckooHash<Key, Value>::remove(const Key& key) {
 template <typename Key, typename Value>
 Value* CuckooHash<Key, Value>::find(const Key& key) {
     // TODO: Implement find
-    
+    size_t index1 = hash1(key, capacity());
+    size_t index2 = hash2(key, capacity());
+
+    if (table_.get(index1).occupied == true && table_.get(index1).key == key) {
+        return &table_.get(index1).value.value();
+    }
+
+    if (table_.get(index2).occupied == true && table_.get(index2).key == key) {
+        return &table_.get(index2).value.value();
+    }
+
+    return nullptr;
 }
 
 template <typename Key, typename Value>
