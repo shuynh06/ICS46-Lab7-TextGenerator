@@ -54,6 +54,14 @@ void TextGenerator<HashTable>::enter(const std::string& first, const std::string
 template <typename HashTable>
 std::string TextGenerator<HashTable>::getNextWord(const std::string& first, const std::string& second) {
     // TODO: implement getNextWord
+    StringPair p(first,second);
+    FreqList* frequencyList= stringPairList_.find(p);
+
+    if (!frequencyList) { return ""; }
+
+    std::uniform_real_distribution<double> distribution{0.0, 1.0};
+    double rand = distribution(rng_);
+    return frequencyList->get(rand);
 
 }
 
