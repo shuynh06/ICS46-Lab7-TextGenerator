@@ -169,13 +169,13 @@ bool CuckooHash<Key, Value>::remove(const Key& key) {
 
     if (table_.get(index1).occupied == true && table_.get(index1).key == key) {
         table_.get(index1).occupied = false;
-        count_--;;
+        count_--;
         return true;
     }
 
     if (table_.get(index2).occupied == true && table_.get(index2).key == key) {
         table_.get(index2).occupied = false;
-        count--;
+        count_--;
         return true;
     }
 
@@ -221,5 +221,17 @@ size_t CuckooHash<Key, Value>::capacity() const {
 template <typename Key, typename Value>
 void CuckooHash<Key, Value>::rehash() {
     // TODO: Implement rehashing by doubling capacity and reinserting all items
-    
+    ArrayList<Slot> oldTable = table_;
+    capacity_ *= 2;
+
+    table_ = ArrayList<Slot>(capacity_);
+    count_ = 0;
+
+    size_t index = 0;
+    while (index < capacity_ / 2) { // says doubling capacity so hopefully this is fine?
+        if (oldTable.get(index).occupied == true) {
+            insert(oldTable.get(index).key.value(), oldTable.get(index).value.value());
+        }
+        index++;
+    }
 }
